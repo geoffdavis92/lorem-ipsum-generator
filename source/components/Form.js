@@ -27,6 +27,7 @@ export default class Form extends Component {
                         type="number"
                         name="count"
                         className="form-control"
+                        min="0"
                         ref={node => this.Count = node}
                         onInput={this.updatePreview}
                     />
