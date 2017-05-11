@@ -9664,13 +9664,13 @@ class Preview extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'pre',
             null,
+            '// Preview:',
             `
 {
   count: ${count ? count : 0},
   units: '${units ? units : 'null'}',
   format: '${format ? format : 'null'}'
-}
-                `
+}`
         );
     }
 }
@@ -9697,10 +9697,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(83);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Form__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Preview__ = __webpack_require__(82);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Output__ = __webpack_require__(184);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utilities_loremIpsum__ = __webpack_require__(185);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lorem_ipsum__ = __webpack_require__(187);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lorem_ipsum___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_lorem_ipsum__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Form__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Preview__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_Output__ = __webpack_require__(184);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_Toast__ = __webpack_require__(189);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__utilities_closeToast__ = __webpack_require__(190);
 
 
 
@@ -9709,59 +9712,109 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+
+
+const alertSettings = {
+  type: "success",
+  text: "Text has been copied."
+};
 
 class App extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
-    constructor() {
-        super();
-        this.state = { count: 0, units: '', format: '', output: '' };
-        this.sendToPreview = this.sendToPreview.bind(this);
-        this.generateText = this.generateText.bind(this);
-    }
-    sendToPreview({ name, value }) {
-        console.log({ [name]: value });
-        this.setState(state => ({ [name]: value }));
-    }
-    generateText() {
-        const { count, units, format } = this.state;
-        const output = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__utilities_loremIpsum__["a" /* default */])({ count, units, format });
-        console.log({ output });
-        console.log(__WEBPACK_IMPORTED_MODULE_5__utilities_loremIpsum__["a" /* default */]);
-        this.setState(state => ({ output }));
-    }
-    render() {
-        const { count, units, format, output } = this.state;
-        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "section",
-            null,
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    "div",
-                    { className: "col-sm-8" },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Form__["a" /* default */], {
-                        inputCallback: this.sendToPreview,
-                        submissionCallback: this.generateText
-                    })
-                ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    "div",
-                    { className: "col-sm-4" },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__components_Preview__["a" /* default */], { data: { count, units, format } })
-                )
-            ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    "div",
-                    { className: "col-sm-12" },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__components_Output__["a" /* default */], { text: output })
-                )
-            )
-        );
-    }
+  constructor() {
+    super();
+    this.state = {
+      _: false,
+      count: 0,
+      units: "",
+      format: "",
+      output: "",
+      alert: {
+        dispatched: false
+      }
+    };
+    this.sendToPreview = this.sendToPreview.bind(this);
+    this.generateText = this.generateText.bind(this);
+    this.dispatchAlert = this.dispatchAlert.bind(this);
+    this.updateState = this.updateState.bind(this);
+  }
+  componentDidMount() {
+    window.addEventListener("resize", e => {
+      console.log("resize", this);
+      this.setState(state => ({ _: !state._ }));
+    });
+  }
+  updateState(newState) {
+    this.setState(state => newState);
+  }
+  sendToPreview({ name, value }) {
+    console.log({ [name]: value });
+    this.setState(state => ({ [name]: value }));
+  }
+  generateText() {
+    const { count, units, format } = this.state;
+    const output = __WEBPACK_IMPORTED_MODULE_2_lorem_ipsum___default()({ count, units, format });
+    // console.log(window.LI({ count, units, format }))
+    // console.log({ output });
+    // console.log(LoremIpsum);
+    this.setState(state => ({ output }));
+  }
+  dispatchAlert() {
+    this.setState(state => ({
+      alert: { dispatched: true }
+    }), () => {
+      // console.log('app.dispatchAlert()',this.state.alert);
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__utilities_closeToast__["a" /* default */])(this.Toast);
+    });
+  }
+  render() {
+    const { count, units, format, output, alert } = this.state;
+    // console.log('rendered app state.alert', this.state.alert)
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "section",
+      { style: { position: "static" } },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6__components_Toast__["a" /* default */], {
+        alertDispatched: alert.dispatched,
+        alertType: alertSettings.type,
+        alertText: alertSettings.text,
+        updateAppState: this.updateState,
+        ref: node => this.Toast = node
+      }),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        window.innerWidth <= 768 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-sm-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__components_Preview__["a" /* default */], { data: { count, units, format } })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-sm-7" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__components_Form__["a" /* default */], {
+            inputCallback: this.sendToPreview,
+            submissionCallback: this.generateText
+          })
+        ),
+        window.innerWidth > 768 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-sm-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__components_Preview__["a" /* default */], { data: { count, units, format } })
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-sm-12" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__components_Output__["a" /* default */], { text: output, clickCallback: this.dispatchAlert })
+        )
+      )
+    );
+  }
 }
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_react_dom__["render"])(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(App, null), document.querySelector("#root"));
@@ -22228,43 +22281,41 @@ module.exports = traverseAllChildren;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 
 
+const OutputStyles = {
+  cursor: 'pointer',
+  fontFamily: "monospace",
+  resize: "none",
+  width: "100%",
+  minHeight: "15em"
+};
+
 class Output extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
-	constructor() {
-		super();
-	}
-	render() {
-		const { text } = this.props;
-		return text !== '' && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('textarea', { value: text });
-	}
+  constructor() {
+    super();
+    this.copyText = this.copyText.bind(this);
+  }
+  copyText({ target }) {
+    target.select();
+    document.execCommand("copy");
+    target.blur();
+    this.props.clickCallback();
+  }
+  render() {
+    const { text } = this.props;
+    return text !== "" && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("textarea", {
+      value: text,
+      className: "form-control",
+      style: OutputStyles,
+      readOnly: true,
+      onClick: this.copyText
+    });
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Output;
 
 
 /***/ }),
-/* 185 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lorem_ipsum__ = __webpack_require__(187);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lorem_ipsum___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lorem_ipsum__);
-
-
-window.LI = __WEBPACK_IMPORTED_MODULE_0_lorem_ipsum___default.a;
-
-const test = __WEBPACK_IMPORTED_MODULE_0_lorem_ipsum___default()({
-    count: 1 // Number of words, sentences, or paragraphs to generate. 
-    , units: 'words' // Generate words, sentences, or paragraphs. 
-    , sentenceLowerBound: 5 // Minimum words per sentence. 
-    , sentenceUpperBound: 15 // Maximum words per sentence. 
-    , paragraphLowerBound: 3 // Minimum sentences per paragraph. 
-    , paragraphUpperBound: 7 // Maximum sentences per paragraph. 
-    , format: 'plain' // Plain text or html // Custom word dictionary. Uses dictionary.words (in lib/dictionary.js) by default. 
-    , random: Math.random
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (config => __WEBPACK_IMPORTED_MODULE_0_lorem_ipsum___default()({ config }));
-
-/***/ }),
+/* 185 */,
 /* 186 */
 /***/ (function(module, exports) {
 
@@ -22528,6 +22579,110 @@ exports.tmpdir = exports.tmpDir = function () {
 
 exports.EOL = '\n';
 
+
+/***/ }),
+/* 189 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+const ToastStyles = {
+  position: "absolute",
+  top: "2em",
+  right: "-275px",
+  transition: ".45s right",
+  width: "275px"
+};
+
+class Toast extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
+  constructor() {
+    super();
+    this.state = { isOpen: false };
+    this.close = this.close.bind(this);
+  }
+  componentWillReceiveProps(nextProps) {
+    console.log("toast.componentWillReceiveProps()", nextProps);
+    if (nextProps.alertDispatched) {
+      this.setState(state => ({ isOpen: true }), () => console.log("toast.componentWillReceiveProps()", this.state));
+    }
+  }
+  close(e) {
+    if (e) {
+      this.setState(state => ({ isOpen: false }), () => {
+        this.props.updateAppState({ alert: { dispatched: false } });
+        console.log("toast.close(e)", this.state);
+      });
+    } else {
+      setTimeout(() => {
+        this.setState(state => ({ isOpen: false }), () => {
+          this.props.updateAppState({ alert: { dispatched: false } });
+          console.log("toast.close()", this.state);
+        });
+      }, 2500);
+    }
+  }
+  render() {
+    console.log("toast.render()", this.props);
+    const { alertType, alertText, alertDispatched } = this.props;
+    const assignStyles = () => {
+      let dispatchedToastStyles;
+      if (this.state.isOpen && alertDispatched) {
+        dispatchedToastStyles = Object.assign({}, ToastStyles, {
+          right: "2em"
+        });
+      } else {
+        dispatchedToastStyles = ToastStyles;
+      }
+      return dispatchedToastStyles;
+    };
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      {
+        className: "alert alert-success alert-dismissible",
+        style: assignStyles(),
+        role: "alert"
+      },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "button",
+        {
+          type: "button",
+          className: "close",
+          "aria-label": "Close",
+          onClick: this.close,
+          "data-close": "immediate"
+        },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "span",
+          { "aria-hidden": "true" },
+          "\xD7"
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "strong",
+        { style: { textTransform: "capitalize" } },
+        alertType,
+        "!"
+      ),
+      " ",
+      alertText
+    );
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Toast;
+
+
+/***/ }),
+/* 190 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ((toast, callback) => {
+	toast.close();
+	return callback;
+});
 
 /***/ })
 /******/ ]);
